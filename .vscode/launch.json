@@ -5,6 +5,31 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "node",
+            "request": "launch",
+            "name": "nodemon",
+            "runtimeExecutable": "nodemon",
+            "program": "${workspaceRoot}\\src\\server.ts",
+            "restart": true,
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        },
+
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Attach",
+            "port": 9229,
+            "program": "${workspaceFolder}\\src\\server.ts"
+        },
+        
+        {
+            "type": "browser-preview",
+            "request": "launch",
+            "name": "Browser Preview: Launch",
+            "url": "http://localhost:3000/api/src/favicon.ico"
+        },
+        {
             "type": "chrome",
             "request": "launch",
             "name": "Launch Chrome against localhost",
