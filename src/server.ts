@@ -16,7 +16,7 @@ function onProxyServerReq(proxyReq: http.ClientRequest, req: http.IncomingMessag
   // add custom header to request
   // proxyReq.setHeader('x-added', 'foobar');
   // or log the req
-  console.trace(proxyReq);
+  console.info(proxyReq);
 }
 
 // proxy middleware options
@@ -26,14 +26,16 @@ const options: proxy.Config = {
   ws: true, // proxy websockets
 
   pathRewrite: {
-    //   '^/api/old-path': '/api/new-path', // rewrite path
-    //   '^/api/remove/path': '/path' // remove base path
+      //  '^/api/old-path': '/api/new-path', // rewrite path
+       '^/api/': '', // remove base path
+       '^/graphql/': 'graphql', // remove base path
   },
   router: {
-    'localhost:3000/api'         : 'http://localhost:35636'  // host + path
-    // when request.headers.host == 'dev.localhost:3000',
-    // override target 'http://www.example.org' to 'http://localhost:8000'
-    //'dev.localhost:3000': 'http://localhost:35636',
+  //   'localhost:3000/api'         : ''  // host + path
+  //   // when request.headers.host == 'dev.localhost:3000',
+  //   // override target 'http://www.example.org' to 'http://localhost:8000'
+      //  'http:.localhost:3000/api'       : 'http://localhost:35636',
+      //  'http://localhost:3000/graphql'  : 'http://localhost:35636/graphql',
   },
   onError: (err, req, res) => onProxyServerError(err, req, res),
   onProxyReq: (proxyReq, req, res) => onProxyServerReq(proxyReq, req, res),
@@ -44,7 +46,7 @@ const options: proxy.Config = {
 const exampleProxy = proxy(options);
 
 // mount `exampleProxy` in web server
-app.use('/api', exampleProxy);
+app.use('**', exampleProxy);
 
 // Listen for the `error` event on `proxy`.
 
@@ -58,4 +60,3 @@ app.use('/api', exampleProxy);
 // });
 
 app.listen(3000, () => console.log('Example app listening on port 3000!'));
-

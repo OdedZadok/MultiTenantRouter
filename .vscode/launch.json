@@ -7,6 +7,19 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Debug TypeScript in Node.js",
+            "preLaunchTask": "npm: build-ts",
+            "program": "${workspaceFolder}/src/server.ts",
+            "cwd": "${workspaceFolder}",
+            "protocol": "inspector",
+            "outFiles": [
+              "${workspaceFolder}/dist/**/*.js"
+            ]
+          },
+        
+        {
+            "type": "node",
+            "request": "launch",
             "name": "nodemon",
             "runtimeExecutable": "nodemon",
             "program": "${workspaceRoot}\\src\\server.ts",
