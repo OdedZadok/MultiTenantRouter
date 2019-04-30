@@ -3,31 +3,36 @@ import http from 'http';
 import proxy from 'http-proxy-middleware';
 
 const app = express();
-
-app.get('/Test/api', (req, res) => {
-  res.send('Work' + req.url);
-});
+const app2 = express();
 
 function onProxyServerError(err: Error, req: http.IncomingMessage, res: http.ServerResponse): void {
   console.error(err);
 }
 
 function onProxyServerReq(proxyReq: http.ClientRequest, req: http.IncomingMessage, res: http.ServerResponse): void {
-  // add custom header to request
-  // proxyReq.setHeader('x-added', 'foobar');
-  // or log the req
-  console.info(proxyReq);
+  if (req.connection.localPort === 3000) {
+    proxyReq.setHeader('tenant', 'TI_QA_80');
+  } else if (req.connection.localPort === 3001) {
+    proxyReq.setHeader('tenant', 'TI_QA_69');
+  }
+
+  if (res.statusCode === 200 ) {
+    // console.info(req.url);
+  } else {
+    console.error(req.url + ': ' + res.statusMessage);
+  }
 }
 
 // proxy middleware options
 const options: proxy.Config = {
   target: 'http://localhost:35636', // target host
+// tslint:disable-next-line: object-literal-sort-keys
   changeOrigin: true, // needed for virtual hosted sites
-  ws: true, // proxy websockets
+  ws: true, // proxy websocket
 
   pathRewrite: {
       //  '^/api/old-path': '/api/new-path', // rewrite path
-       '^/api/': '', // remove base path
+       '^/Router/': '', // remove base path
        '^/graphql/': 'graphql', // remove base path
   },
   router: {
@@ -42,21 +47,13 @@ const options: proxy.Config = {
   logLevel: 'debug',
 };
 
-// create the proxy (without context)
 const exampleProxy = proxy(options);
 
-// mount `exampleProxy` in web server
+app.get('/qa', (req, res) => {
+  res.sendFile('C:/Users/user/Documents/GitHub/MultiTenantRouter/src/qa.html');
+});
 app.use('**', exampleProxy);
-
-// Listen for the `error` event on `proxy`.
-
-// app.get('/', (req, res) => res.send('Hello World!'));
-
-// app.use('/Router/', (req, res, next) => {
-//     console.log(req.url);
-//     res.send("Hello " + req.method + req.url);
-//     next();
-
-// });
-
 app.listen(3000, () => console.log('Example app listening on port 3000!'));
+
+app2.use('**', exampleProxy);
+app2.listen(3001, () => console.log('Example app listening on port 3001!'));
